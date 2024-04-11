@@ -1,6 +1,3 @@
-Here's an updated README file with emojis added:
-
----
 
 # 📈 Stock Prediction
 
