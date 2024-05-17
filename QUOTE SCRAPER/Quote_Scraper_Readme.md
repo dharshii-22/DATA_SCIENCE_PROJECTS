@@ -1,71 +1,55 @@
-import requests
-from bs4 import BeautifulSoup
-from csv import writer
-from time import sleep
-from random import choice
+## Quote Scraper and Quiz Game 📝💬
+This Python script scrapes quotes from the website quotes.toscrape.com and presents a quiz game where the user has to guess the author of a randomly selected quote.
 
-# list to store scraped data
-all_quotes = []
+### Libraries Used
+requests 🌐: For making HTTP requests.
 
-# this part of the url is constant
-base_url = "http://quotes.toscrape.com/"
+BeautifulSoup 🍲: For parsing HTML documents.
 
-# this part of the url will keep changing
-url = "/page/1"
+csv 📋: For writing data to CSV files.
 
-while url:
+time ⏰: For adding delays between requests.
 
-	# concatenating both urls
-	# making request
-	res = requests.get(f"{base_url}{url}")
-	print(f"Now Scraping{base_url}{url}")
-	soup = BeautifulSoup(res.text, "html.parser")
+random 🎲: For random selection.
 
-	# extracting all elements
-	quotes = soup.find_all(class_="quote")
+### Features
+Scrapes quotes, authors, and author bio links from multiple pages.
 
-	for quote in quotes:
-		all_quotes.append({
-			"text": quote.find(class_="text").get_text(),
-			"author": quote.find(class_="author").get_text(),
-			"bio-link": quote.find("a")["href"]
-		})
-	next_btn = soup.find(_class="next")
-	url = next_btn.find("a")["href"] if next_btn else None
-	sleep(2)
+Stores the scraped data in a list.
 
-quote = choice(all_quotes)
-remaining_guesses = 4
-print("Here's a quote: ")
-print(quote["text"])
+Presents a random quote to the user and asks them to guess the author.
 
-guess = ''
-while guess.lower() != quote["author"].lower() and remaining_guesses > 0:
-	guess = input(
-		f"Who said this quote? Guesses remaining {remaining_guesses}")
-	
-	if guess == quote["author"]:
-		print("CONGRATULATIONS!!! YOU GOT IT RIGHT")
-		break
-	remaining_guesses -= 1
-	
-	if remaining_guesses == 3:
-		res = requests.get(f"{base_url}{quote['bio-link']}")
-		soup = BeautifulSoup(res.text, "html.parser")
-		birth_date = soup.find(class_="author-born-date").get_text()
-		birth_place = soup.find(class_="author-born-location").get_text()
-		print(
-			f"Here's a hint: The author was born on {birth_date}{birth_place}")
-	
-	elif remaining_guesses == 2:
-		print(
-			f"Here's a hint: The author's first name starts with: {quote['author'][0]}")
-	
-	elif remaining_guesses == 1:
-		last_initial = quote["author"].split(" ")[1][0]
-		print(
-			f"Here's a hint: The author's last name starts with: {last_initial}")
-	
-	else:
-		print(
-			f"Sorry, you ran out of guesses. The answer was {quote['author']}")
+Provides hints to the user if they guess incorrectly.
+
+## How It Works
+#### Scraping Quotes:
+
+The script starts by initializing an empty list all_quotes to store the scraped data.
+
+The base_url is set to "http://quotes.toscrape.com/", and the initial url is set to "/page/1".
+
+The script enters a loop where it makes requests to the current page, parses the HTML, and extracts quotes, authors, and bio links.
+
+If a "next" button is found, the script updates the url to the next page and continues scraping. The loop continues until there are no more pages.
+
+#### Storing Quotes:
+
+For each quote found on the page, the text, author, and bio link are extracted and appended to the all_quotes list.
+Quiz Game:
+
+A random quote is selected from the all_quotes list.
+
+The user is presented with the quote and asked to guess the author.
+
+The user has four guesses, and hints are provided if they guess incorrectly:
+
+After the first incorrect guess, a hint with the author's birth date and place is given.
+
+After the second incorrect guess, a hint with the author's first initial is given.
+
+After the third incorrect guess, a hint with the author's last initial is given.
+
+If the user runs out of guesses, the correct answer is revealed.
+
+### Sample Output
+![image](https://github.com/dharshii-22/DATA_SCIENCE_PROJECTS/assets/110839215/de1b38c0-3e38-4c0d-90f0-48c1c47235ce)
